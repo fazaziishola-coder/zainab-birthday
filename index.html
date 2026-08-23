@@ -14,6 +14,8 @@
     --card-surface:#241A3E;
     --gold:#E8B94A;
     --rose:#E89076;
+    --pink:#F0879C;
+    --teal:#4FB6A8;
     --warm-white:#FBF6EE;
     --dawn-1:#FBF1DE;
     --dawn-2:#F7E4C6;
@@ -126,7 +128,7 @@
     border:1.5px solid currentColor;
   }
   .swipe-badge.next{ right:16px; color:var(--gold); }
-  .swipe-badge.replay{ left:16px; color:var(--rose); }
+  .swipe-badge.back{ left:16px; color:var(--teal); }
 
   #skip-btn{
     margin-top:26px; font-size:0.82rem; color:#B7ADD1;
@@ -179,7 +181,8 @@
   .hero-badge{
     display:inline-flex; align-items:center; gap:6px;
     padding:7px 16px; border-radius:999px;
-    background:#fff; border:1px solid #EFE1C4;
+    background:linear-gradient(120deg, #FFF, #FFF3E0);
+    border:1px solid #EFE1C4;
     font-size:0.74rem; color:var(--ink-soft); margin-bottom:18px;
   }
   .hero .eyebrow{ display:block; }
@@ -198,7 +201,11 @@
 
   .stats-row{ display:flex; gap:32px; justify-content:center; margin-top:44px; flex-wrap:wrap; }
   .stat{ text-align:center; }
-  .stat .stat-num{ font-family:'Fraunces', serif; font-size:1.6rem; color:var(--ink); line-height:1; }
+  .stat:nth-child(1) .stat-num{ color:var(--gold); }
+  .stat:nth-child(2) .stat-num{ color:var(--pink); }
+  .stat:nth-child(3) .stat-num{ color:var(--teal); }
+  .stat .stat-num{ font-family:'Fraunces', serif; font-size:1.7rem; line-height:1; transition:transform 0.25s cubic-bezier(.34,1.56,.64,1); }
+  .stat:hover .stat-num{ transform:scale(1.15) rotate(-4deg); }
   .stat .stat-label{ font-size:0.68rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--ink-soft); margin-top:6px; }
 
   section{ padding:130px 0; position:relative; }
@@ -252,7 +259,9 @@
     background:linear-gradient(160deg, #F1DFC0, #E8C89A);
     display:flex; align-items:center; justify-content:center;
     font-size:0.75rem; font-weight:500; color:#8A6E3C; letter-spacing:0.02em;
+    transition:transform 0.3s cubic-bezier(.34,1.56,.64,1);
   }
+  .gallery .shot:hover{ transform:scale(1.05) rotate(-1.5deg); }
   .gallery .shot img{ width:100%; height:100%; object-fit:cover; display:block; }
 
   .messages{ display:flex; flex-direction:column; gap:16px; }
@@ -265,7 +274,9 @@
     flex-shrink:0; width:34px; height:34px; border-radius:50%;
     background:var(--gold); color:#fff; font-weight:700; font-size:0.8rem;
     display:flex; align-items:center; justify-content:center; line-height:1;
+    transition:transform 0.3s cubic-bezier(.34,1.56,.64,1);
   }
+  .msg:hover .avatar{ transform:rotate(14deg) scale(1.12); }
   .msg .who-text{ display:flex; flex-direction:column; gap:1px; }
   .msg .from-rel{ font-size:0.74rem; color:var(--ink-soft); line-height:1.3; font-style:italic; }
   .msg .from-name{ font-weight:600; font-size:0.96rem; line-height:1.25; font-family:'Fraunces', serif; }
@@ -321,9 +332,9 @@
     animation-name:confetti-fall; animation-timing-function:linear; animation-fill-mode:forwards;
   }
   @keyframes confetti-fall{
-    0%{ transform:translateY(0) rotate(0deg); opacity:1; }
+    0%{ transform:translate(0, 0) rotate(0deg); opacity:1; }
     85%{ opacity:1; }
-    100%{ transform:translateY(112vh) rotate(340deg); opacity:0; }
+    100%{ transform:translate(var(--drift, 0px), 112vh) rotate(340deg); opacity:0; }
   }
 
   #hurray{
@@ -453,7 +464,7 @@
 
   <section id="smile">
     <div class="wrap">
-      <div class="reveal">
+      <div class="reveal" id="smile-reveal">
         <span class="section-icon">🌈</span>
         <h2>Open When You Need A Smile</h2>
         <p class="section-lede">A little something for the harder days.</p>
@@ -494,7 +505,7 @@
 const CONFIG = {
   name: "Zainab",
   fullName: "Zainab Fasasi Adeleke",
-  ageTurning: 20, // update this — controls how many chapters get generated
+  ageTurning: 37, // controls how many chapters get generated
 
   videos: [
     { name: "[Person 1]", relation: "[Relationship]", src: "videos/video1.mp4" },
@@ -592,11 +603,12 @@ photoSlots.forEach((src, i) => {
 
 // Messages
 const messagesList = document.getElementById('messages-list');
+const AVATAR_COLORS = ['var(--gold)', 'var(--pink)', 'var(--teal)', 'var(--rose)'];
 CONFIG.messages.forEach((m, i) => {
   const el = document.createElement('div');
   el.className = 'msg reveal';
   el.style.transitionDelay = `${(i % 3) * 110}ms`;
-  el.innerHTML = `<div class="who"><div class="avatar">${initial(m.name)}</div>
+  el.innerHTML = `<div class="who"><div class="avatar" style="background:${AVATAR_COLORS[i % AVATAR_COLORS.length]}">${initial(m.name)}</div>
                    <div class="who-text"><div class="from-rel">${m.relation}</div><div class="from-name">From ${m.name}</div></div></div>
                    <div class="body">${m.body}</div>
                    <div class="msg-extra">
@@ -658,7 +670,7 @@ function buildCard(v, stackPos){
   card.style.transform = `translateY(${stackPos * 10}px) scale(${1 - stackPos * 0.04})`;
   card.innerHTML = `
     <div class="swipe-badge next">Next &rarr;</div>
-    <div class="swipe-badge replay">&larr; Replay</div>
+    <div class="swipe-badge back">&larr; Back</div>
     <div class="vwrap">
       <video playsinline muted src="${v.src}"></video>
       <div class="play-hint"><div class="ring">►</div><span>Tap to play</span></div>
@@ -698,7 +710,7 @@ function attachTopCardEvents(){
     if (Math.abs(dx) > 6 || Math.abs(dy) > 6) moved = true;
     top.style.transform = `translate(${dx}px, ${dy*0.15}px) rotate(${dx/18}deg)`;
     top.querySelector('.swipe-badge.next').style.opacity = dx > 30 ? 1 : 0;
-    top.querySelector('.swipe-badge.replay').style.opacity = dx < -30 ? 1 : 0;
+    top.querySelector('.swipe-badge.back').style.opacity = dx < -30 ? 1 : 0;
   };
   const onUp = () => {
     if (!dragging) return;
@@ -709,7 +721,7 @@ function attachTopCardEvents(){
     } else {
       top.style.transform = '';
       top.querySelector('.swipe-badge.next').style.opacity = 0;
-      top.querySelector('.swipe-badge.replay').style.opacity = 0;
+      top.querySelector('.swipe-badge.back').style.opacity = 0;
     }
     dx = 0;
   };
@@ -729,14 +741,31 @@ function attachTopCardEvents(){
 function advance(dir){
   const top = stackEl.querySelector('.vcard');
   if (!top) return;
-  top.style.transform = `translate(${dir * 500}px, -30px) rotate(${dir * 22}deg)`;
-  top.style.transition = 'transform 0.45s ease-in';
-  if (dots[cardIndex]) dots[cardIndex].classList.add('lit');
-  cardIndex++;
-  setTimeout(() => {
-    if (cardIndex >= CONFIG.videos.length) { revealSite(); }
-    else { renderStack(); }
-  }, 260);
+
+  if (dir > 0){
+    // swipe right — go to the next video
+    top.style.transform = `translate(500px, -30px) rotate(22deg)`;
+    top.style.transition = 'transform 0.45s ease-in';
+    if (dots[cardIndex]) dots[cardIndex].classList.add('lit');
+    cardIndex++;
+    setTimeout(() => {
+      if (cardIndex >= CONFIG.videos.length) { revealSite(); }
+      else { renderStack(); }
+    }, 260);
+  } else {
+    // swipe left — go back to the previous video (in case of a mistaken swipe)
+    if (cardIndex === 0){
+      // already at the first video — bounce back in place instead of going anywhere
+      top.style.transition = 'transform 0.4s cubic-bezier(.34,1.56,.64,1)';
+      top.style.transform = '';
+      return;
+    }
+    top.style.transform = `translate(-500px, -30px) rotate(-22deg)`;
+    top.style.transition = 'transform 0.45s ease-in';
+    cardIndex--;
+    if (dots[cardIndex]) dots[cardIndex].classList.remove('lit');
+    setTimeout(() => { renderStack(); }, 260);
+  }
 }
 
 function revealSite(){
@@ -756,25 +785,26 @@ function revealSite(){
   }, 700);
 }
 
-function spawnConfetti(){
+function spawnConfetti(count = 70){
   const container = document.getElementById('confetti');
-  const bits = ['✨', '🎉', '🌟', '💛', '🎊'];
-  const count = 32;
+  const bits = ['✨', '🎉', '🌟', '💛', '🎊', '🎈', '💫', '🥳', '🌸', '💖'];
   for (let i = 0; i < count; i++){
     const piece = document.createElement('span');
     piece.className = 'confetti-piece';
     piece.textContent = bits[Math.floor(Math.random() * bits.length)];
     const left = Math.random() * 100;
-    const size = 14 + Math.random() * 16;
-    const duration = 2.6 + Math.random() * 2.2;
-    const delay = Math.random() * 0.6;
+    const size = 13 + Math.random() * 20;
+    const duration = 2.4 + Math.random() * 3;
+    const delay = Math.random() * 1.1;
+    const drift = (Math.random() * 60 - 30).toFixed(0);
     piece.style.left = `${left}vw`;
     piece.style.fontSize = `${size}px`;
     piece.style.animationDuration = `${duration}s`;
     piece.style.animationDelay = `${delay}s`;
+    piece.style.setProperty('--drift', `${drift}px`);
     container.appendChild(piece);
   }
-  setTimeout(() => { container.innerHTML = ''; }, 6000);
+  setTimeout(() => { container.innerHTML = ''; }, 7500);
 }
 
 document.getElementById('skip-btn').addEventListener('click', revealSite);
@@ -790,18 +820,24 @@ musicBtn.addEventListener('click', () => {
   playing = !playing;
 });
 
-/* ---------------- smooth slide-in on scroll (lusion.co-style) ---------------- */
+/* ---------------- smooth slide-in on scroll, replays every time (lusion.co-style) ---------------- */
+let smileConfettiFired = false;
 const revealObserver = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
       entry.target.classList.add('in-view');
-      revealObserver.unobserve(entry.target);
+      if (entry.target.id === 'smile-reveal' && !smileConfettiFired) {
+        smileConfettiFired = true;
+        spawnConfetti(20);
+      }
+    } else {
+      entry.target.classList.remove('in-view');
     }
   });
 }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
 
 document.querySelectorAll('.reveal').forEach(el => {
-  if (el.id === 'hero-reveal') return; // hero is triggered by revealSite(), not scroll
+  if (el.id === 'hero-reveal') return; // hero is triggered once by revealSite(), not by scrolling
   revealObserver.observe(el);
 });
 
