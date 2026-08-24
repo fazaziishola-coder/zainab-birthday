@@ -95,12 +95,34 @@
   .vcard video{
     width:100%; height:100%; object-fit:cover; display:block;
     background:#120C22;
+    transition:filter .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1);
   }
+  .vcard:not(.revealed) video{ filter:blur(14px) brightness(.48); transform:scale(1.08); }
+  .video-reveal-cover{
+    position:absolute; inset:0; z-index:4;
+    display:grid; place-items:center; padding:28px;
+    background:
+      radial-gradient(circle at 50% 38%,rgba(232,185,74,.22),transparent 38%),
+      linear-gradient(180deg,rgba(18,12,34,.18),rgba(18,12,34,.74));
+    color:#FFF9EA; text-align:center; pointer-events:none;
+    transition:opacity .55s ease, transform .7s cubic-bezier(.16,1,.3,1);
+  }
+  .vcard.revealed .video-reveal-cover{ opacity:0; transform:scale(1.08); }
+  .video-reveal-inner{ display:grid; justify-items:center; gap:10px; }
+  .video-gift{
+    display:grid; place-items:center; width:68px; height:68px; border-radius:22px;
+    background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.28);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 16px 34px rgba(4,2,12,.28);
+    font-size:1.8rem; animation:gift-breathe 2.2s ease-in-out infinite;
+  }
+  .video-reveal-inner strong{ font-size:1rem; font-weight:600; letter-spacing:.01em; }
+  .video-reveal-inner small{ color:#DCD4EE; font-size:.7rem; }
+  @keyframes gift-breathe{ 50%{ transform:translateY(-5px) rotate(-2deg); } }
   .vcard .play-hint{
     position:absolute; inset:0;
     display:flex; align-items:center; justify-content:center;
     flex-direction:column; gap:10px;
-    pointer-events:none; transition:opacity .25s ease, transform .25s ease;
+    opacity:0; pointer-events:none; transition:opacity .25s ease, transform .25s ease;
   }
   .play-hint .ring{
     width:56px; height:56px; border-radius:50%;
@@ -590,7 +612,7 @@ const CONFIG = {
   ageTurning: 37, // controls how many chapters get generated
 
   videos: [
-    { name: "[Person 1]", relation: "[Relationship]", src: "videos/video1.mp4" },
+    { name: "[Person 1]", relation: "[Relationship]", src: "videos/zainab-birthday-greeting.mp4" },
     { name: "[Person 2]", relation: "[Relationship]", src: "videos/video2.mp4" },
     { name: "[Person 3]", relation: "[Relationship]", src: "videos/video3.mp4" }
   ],
@@ -817,11 +839,21 @@ function updateIntroUI(){
 function buildCard(v, stackPos){
   const card = document.createElement('div');
   card.className = 'vcard';
+  card.setAttribute('role', 'button');
+  card.setAttribute('tabindex', stackPos === 0 ? '0' : '-1');
+  card.setAttribute('aria-label', stackPos === 0 ? 'Tap to reveal this birthday video' : 'Upcoming birthday video');
   card.style.zIndex = 10 - stackPos;
   card.style.transform = `translateY(${stackPos * 10}px) scale(${1 - stackPos * 0.04})`;
   card.innerHTML = `
     <div class="vwrap">
       <video playsinline muted src="${v.src}"></video>
+      <div class="video-reveal-cover" aria-hidden="true">
+        <div class="video-reveal-inner">
+          <div class="video-gift">🎁</div>
+          <strong>Tap to reveal</strong>
+          <small>A birthday message is waiting</small>
+        </div>
+      </div>
       <div class="play-hint"><div class="ring">►</div><span>Tap to play</span></div>
       <div class="video-unavailable"><span>🎥<br>This video message is still being wrapped up.<br>You can continue to the next surprise.</span></div>
     </div>
@@ -844,6 +876,14 @@ function attachTopCardEvents(){
   const video = top.querySelector('video');
   const hint = top.querySelector('.play-hint');
   video.addEventListener('play', () => { hint.style.opacity = 0; hint.style.transform = 'scale(.85)'; });
+  video.addEventListener('pause', () => {
+    if (!video.ended && top.classList.contains('revealed')) {
+      hint.querySelector('.ring').textContent = '►';
+      hint.querySelector('span').textContent = 'Tap to continue';
+      hint.style.opacity = 1;
+      hint.style.transform = 'scale(1)';
+    }
+  });
   video.addEventListener('ended', () => {
     hint.querySelector('.ring').textContent = '✓';
     hint.querySelector('span').textContent = cardIndex === CONFIG.videos.length - 1 ? 'Ready for the surprise' : 'Message complete · continue';
@@ -890,8 +930,24 @@ function attachTopCardEvents(){
 
   top.addEventListener('click', () => {
     if (moved) return; // was a drag, not a tap
+    if (!top.classList.contains('revealed')) {
+      top.classList.add('revealed');
+      top.setAttribute('aria-label', 'Pause or play this birthday video');
+      video.muted = false;
+      video.play().catch(() => {
+        hint.style.opacity = 1;
+        hint.style.transform = 'scale(1)';
+      });
+      return;
+    }
     if (video.paused) { video.play().catch(()=>{}); video.muted = false; hint.style.opacity = 0; }
     else { video.pause(); hint.style.opacity = 1; }
+  });
+  top.addEventListener('keydown', event => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      top.click();
+    }
   });
 }
 
