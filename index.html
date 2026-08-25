@@ -467,7 +467,7 @@
     <h1>A few messages for you</h1>
   </div>
 
-  <div id="intro-count">01 / 03</div>
+  <div id="intro-count">01 / 02</div>
 
   <div class="card-stack" id="card-stack"></div>
 
@@ -615,8 +615,7 @@ const CONFIG = {
 
   videos: [
     { name: "[Person 1]", relation: "[Relationship]", src: "videos/zainab-birthday-greeting.mp4" },
-    { name: "[Person 2]", relation: "[Relationship]", src: "videos/video2.mp4" },
-    { name: "[Person 3]", relation: "[Relationship]", src: "videos/video3.mp4" }
+    { name: "[Person 2]", relation: "[Relationship]", src: "videos/birthday-cinematic.mp4" }
   ],
 
   // Leave chapters empty to auto-generate placeholder chapters equal to ageTurning,
@@ -633,10 +632,9 @@ const CONFIG = {
   ],
 
   messages: [
-    { name: "[Name]", relation: "sister", body: "Happy birthday to the sweetest person I know. Watching you grow into who you are has been one of my favorite things. I hope this year gives you everything you've been quietly hoping for.", love: "How she never lets anyone around her feel small.", wish: "That this year brings her twice the peace she gives everyone else." },
-    { name: "[Name]", relation: "best friend", body: "You have this way of making every room warmer just by being in it. I'm so grateful I get to call you my person. Here's to another year of us causing good trouble together.", love: "Her laugh — you can hear it from another room.", wish: "That every door she knocks on this year opens." },
-    { name: "[Name]", relation: "cousin", body: "From the outside looking in, I've always admired how steady and kind you are, even when things get hard. May this new year bring you the same softness you give everyone else.", love: "How dependable she is, even when it costs her something.", wish: "A year that finally slows down enough for her to enjoy it." },
-    { name: "[Name]", relation: "friend", body: "Happy birthday! You deserve every good thing headed your way this year, and a few surprises too. Thank you for always showing up for the people you love.", love: "How she remembers the small things about everyone.", wish: "That she's celebrated as much as she celebrates others." }
+    { name: "Ife", relation: "friend", body: "Happy birthday, Zainab. I hope today reminds you of the warmth and light you bring to the people who know you. May this new year bring you peace, answered prayers, joyful adventures, and many reasons to smile. I am grateful for the friendship we share.", love: "Her warm spirit and the genuine way she shows care.", wish: "A year filled with peace, progress, laughter, and beautiful surprises." },
+    { name: "Abdulbasit & his brother", relation: "family", body: "Happy birthday, Aunty Zainab. We may not both get the chance to speak with you often, but you are family and warmly remembered. I, Abdulbasit, am especially grateful for the bond we share, and my brother joins me in wishing you a year filled with peace, success, good health, and moments that make you truly happy.", love: "Her strength, warmth, and the easy kindness she shows the people close to her.", wish: "That this new year brings her peace at heart, success in her plans, and many moments worth celebrating.", loveLabel: "Something we appreciate about her", wishLabel: "Our birthday wish for her" },
+    { name: "Baidoh & Balikis", relation: "family", body: "Happy birthday, Aunty Zainab. It has been a long time since we talked, but we wanted you to know we are thinking of you today. We hope you have a lovely birthday, eat plenty of cake, and enjoy many reasons to smile. May your new year be filled with happiness, good health, success, and lovely surprises. With love, Baidoh and Balikis.", love: "Her beautiful smile and the confidence she carries.", wish: "That Aunty Zainab stays happy, healthy, and achieves everything she hopes for.", loveLabel: "Something we admire about her", wishLabel: "Our birthday wish for her" }
   ],
 
   smiles: [
@@ -794,8 +792,8 @@ CONFIG.messages.forEach((m, i) => {
                    <div class="who-text"><div class="from-rel">A birthday note</div><div class="from-name">${senderName}</div></div></div>
                    <div class="body">${m.body}</div>
                    <div class="msg-extra">
-                     <div><div class="extra-label">One thing I love about her</div><div class="extra-text">${m.love}</div></div>
-                     <div><div class="extra-label">My birthday wish for her</div><div class="extra-text">${m.wish}</div></div>
+                     <div><div class="extra-label">${m.loveLabel || 'One thing I love about her'}</div><div class="extra-text">${m.love}</div></div>
+                     <div><div class="extra-label">${m.wishLabel || 'My birthday wish for her'}</div><div class="extra-text">${m.wish}</div></div>
                    </div>`;
   messagesList.appendChild(el);
 });
